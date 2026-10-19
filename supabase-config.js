@@ -6,5 +6,7 @@ window.ECON_SUPABASE = Object.freeze({
   // Anonymous Sign-Ins、005 SQL 與學生名冊均已完成。
   studentCloudAuthEnabled: true,
   // 007 題庫與伺服器判分 SQL 已完成。
-  cloudLearningSyncEnabled: true
+  cloudLearningSyncEnabled: true,
+  // 執行 008 排行榜 SQL 後才改為 true。
+  leaderboardEnabled: false
 });
