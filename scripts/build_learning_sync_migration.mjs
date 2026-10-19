@@ -8,8 +8,12 @@ vm.createContext(context);
 vm.runInContext(source,context);
 const bank=context.window.QUESTION_BANK;
 const rows=[];
+const seenQuestions=new Set();
 for(const [unit,questions] of Object.entries(bank)){
   questions.forEach((q,index)=>{
+    const uniqueKey=`${unit}\n${q[0]}`;
+    if(seenQuestions.has(uniqueKey)) return;
+    seenQuestions.add(uniqueKey);
     const choices=Array.isArray(q[1])?q[1]:['錯誤','正確'];
     const correctIndex=Array.isArray(q[1])?q[2]:q[1];
     const explanation=Array.isArray(q[1])?q[3]:q[2];

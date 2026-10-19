@@ -23,7 +23,7 @@
 8. 執行 RLS 負面測試後，才將 Supabase 客戶端接入現有網站。
 9. 執行 `005_activation_code_management.sql`，由教師為名冊學生發放至少 6 碼的一次性啟用碼。
 10. 在 Authentication → Providers 啟用 Anonymous Sign-Ins；完成測試後才將 `studentCloudAuthEnabled` 改為 `true`。
-11. 執行 `007_question_catalog_learning_sync.sql`；確認20單元共383題後，才將 `cloudLearningSyncEnabled` 改為 `true`。
+11. 執行 `007_question_catalog_learning_sync.sql`；確認20單元共373個唯一題目後，才將 `cloudLearningSyncEnabled` 改為 `true`。
 
 ## 尚未啟用
 
