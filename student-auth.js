@@ -63,5 +63,20 @@
   }
 
   window.login=function(){originalLogin();addActivationField()};
-  addActivationField();
+
+  async function bootstrap(){
+    const {data}=await client.auth.getSession();
+    const linked=localStorage.getItem('econCloudLinked')==='true';
+    const anonymousSession=Boolean(data.session?.user?.is_anonymous);
+    if(!linked||!anonymousSession){
+      // 只移除舊版快速登入狀態；測驗與諮詢歷程仍保留在瀏覽器。
+      localStorage.removeItem('econStudent');
+      localStorage.removeItem('econCloudLinked');
+      S.student=null;
+      window.login();
+      return;
+    }
+    addActivationField();
+  }
+  bootstrap().catch(()=>{S.student=null;window.login()});
 })();
