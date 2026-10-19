@@ -135,7 +135,8 @@
     const { data } = await client.auth.getSession();
     const user = data.session?.user;
     if (user && await verifyTeacher(user.id)) return renderTeacherDashboard(user);
-    if (user) await client.auth.signOut();
+    // 學生使用 Supabase 匿名工作階段；不可在教師權限檢查時將其登出。
+    if (user && !user.is_anonymous) await client.auth.signOut();
     injectTeacherEntry();
   }
 

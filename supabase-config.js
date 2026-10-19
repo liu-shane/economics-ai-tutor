@@ -3,6 +3,6 @@
 window.ECON_SUPABASE = Object.freeze({
   url: "https://xkjhsqminwzrkxswqqia.supabase.co",
   publishableKey: "sb_publishable_2x7jEM4iAfij_nmXSOEUdQ_xofVq3AF",
-  // 完成 Anonymous Sign-Ins、名冊與 005 SQL 後才改為 true。
-  studentCloudAuthEnabled: false
+  // Anonymous Sign-Ins、005 SQL 與學生名冊均已完成。
+  studentCloudAuthEnabled: true
 });
