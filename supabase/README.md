@@ -15,17 +15,17 @@
 1. 由教師建立 Supabase 專案，地區與校方個資政策需先確認。
 2. 在 Authentication 設定正式 Site URL：
    `https://liu-shane.github.io/economics-ai-tutor/`
-3. 於 Google Cloud 建立 Web OAuth Client，將 Supabase callback URL 加入 Authorized redirect URIs。
-4. 在 Supabase Auth 啟用 Google provider；Client Secret 僅輸入 Supabase Dashboard。
+3. 教師使用 Supabase Email/Password 獨立登入；不啟用公開註冊。
+4. 學生維持「班級＋學號」流程，學生端寫入後端前須另建伺服器端身分交換與防作弊機制。
 5. 依序套用 `migrations/001`、`002`、`003`。
-6. 使用教師 Google 帳號登入一次，再由 SQL Editor 將該 Auth UUID 寫入 `teacher_roles`。
+6. 建立教師 Auth 帳號，再由 SQL Editor 將該 Auth UUID 寫入 `teacher_roles`。
 7. 建立學期、班級、群組設定與學生名冊；啟用碼只能儲存 `crypt()` 雜湊。
 8. 執行 RLS 負面測試後，才將 Supabase 客戶端接入現有網站。
 
 ## 尚未啟用
 
 - 現有網站仍使用 Google Apps Script 同步。
-- Google OAuth 與學生啟用流程尚未載入學生頁面。
+- 教師 Email/Password 登入已接入；學生仍維持原有班級＋學號流程。
 - 積分只建立資料模型；實際加分函式及每日上限將在下一階段以伺服器端交易完成。
 - 排行榜快照排程與教師後台尚未上線。
 
