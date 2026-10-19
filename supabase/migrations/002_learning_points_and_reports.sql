@@ -1,3 +1,5 @@
+begin;
+
 create table public.quiz_attempts (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete restrict,
@@ -217,3 +219,5 @@ create table public.leaderboard_entries (
   constraint leaderboard_entries_rank_check check (rank > 0),
   constraint leaderboard_entries_points_check check (points >= 0)
 );
+
+commit;

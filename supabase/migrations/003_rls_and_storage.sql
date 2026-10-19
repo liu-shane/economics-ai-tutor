@@ -1,3 +1,5 @@
+begin;
+
 alter table public.academic_terms enable row level security;
 alter table public.class_groups enable row level security;
 alter table public.classes enable row level security;
@@ -198,3 +200,5 @@ using (
     where ca.storage_path = name
   )
 );
+
+commit;

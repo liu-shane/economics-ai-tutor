@@ -1,3 +1,5 @@
+begin;
+
 create extension if not exists pgcrypto;
 
 create table public.academic_terms (
@@ -239,3 +241,5 @@ $$;
 
 revoke all on function public.activate_enrollment(uuid, text, text) from public;
 grant execute on function public.activate_enrollment(uuid, text, text) to authenticated;
+
+commit;
