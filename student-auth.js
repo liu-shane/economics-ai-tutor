@@ -43,7 +43,11 @@
       const linked=own.data&&own.data.student_number===studentId&&own.data.classes?.name===className;
       if(!linked){
         if(!code) throw new Error('INVALID_ACTIVATION_CODE');
-        const activated=await client.rpc('activate_enrollment',{requested_class_id:await classId(className),requested_student_number:studentId,activation_code:code});
+        let activated=await client.rpc('activate_enrollment_by_class_name',{requested_class_name:className,requested_student_number:studentId,activation_code:code});
+        // 010 尚未執行時暫時相容舊版函式，避免部署期間完全無法登入。
+        if(activated.error?.code==='PGRST202'){
+          activated=await client.rpc('activate_enrollment',{requested_class_id:await classId(className),requested_student_number:studentId,activation_code:code});
+        }
         if(activated.error) throw activated.error;
       }
       S.student={className,id:studentId};
