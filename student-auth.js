@@ -14,8 +14,8 @@
     form.onsubmit=handleStudentLogin;
   }
 
-  function errorMessage(message){
-    const map={INVALID_ACTIVATION_CODE:'啟用碼錯誤，請重新確認。',ENROLLMENT_NOT_FOUND:'查無此班級與學號，請聯絡教師。',ENROLLMENT_ALREADY_CLAIMED:'此帳號已綁定其他裝置，請由教師重設啟用碼。',ACTIVATION_CODE_EXPIRED:'啟用碼已過期，請向教師索取新碼。'};
+  function errorMessage(message,className='',studentId=''){
+    const map={INVALID_ACTIVATION_CODE:'啟用碼錯誤，請重新確認。',ENROLLMENT_NOT_FOUND:`查無此班級與學號（送出：${className}／${studentId}），請聯絡教師。`,ENROLLMENT_ALREADY_CLAIMED:'此帳號已綁定其他裝置，請由教師重設啟用碼。',ACTIVATION_CODE_EXPIRED:'啟用碼已過期，請向教師索取新碼。'};
     return Object.entries(map).find(([key])=>message.includes(key))?.[1]||'雲端身分驗證失敗，請稍後再試或聯絡教師。';
   }
 
@@ -26,8 +26,8 @@
 
   async function handleStudentLogin(event){
     event.preventDefault();
-    const className=document.getElementById('cls').value;
-    const studentId=document.getElementById('sid').value.trim().toUpperCase();
+    const className=document.getElementById('cls').value.normalize('NFKC').trim();
+    const studentId=document.getElementById('sid').value.normalize('NFKC').trim().toUpperCase();
     const code=document.getElementById('activationCode').value.trim();
     if(!className||!/^[A-Z][0-9]{8}$/.test(studentId)) return showError('請選擇班級，並輸入正確的學號。');
     const submit=event.currentTarget.querySelector('button.primary');
@@ -55,7 +55,7 @@
       localStorage.setItem('econCloudLinked','true');
       window.render('home');
     }catch(error){
-      showError(errorMessage(error.message||''));
+      showError(errorMessage(error.message||'',className,studentId));
       submit.disabled=false;submit.textContent='進入 AI 助教';
     }
   }
