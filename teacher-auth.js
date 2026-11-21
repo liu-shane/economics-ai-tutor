@@ -130,18 +130,14 @@
     host.innerHTML = `<div class="teacher-grid"><div class="stat"><b>${students.size}</b><small>參與學生</small></div><div class="stat"><b>${completed.length}</b><small>完成測驗</small></div><div class="stat"><b>${average}</b><small>平均成績</small></div><div class="stat"><b>${consultations.length}</b><small>AI 諮詢</small></div></div><section class="card teacher-section"><h2>最近測驗紀錄</h2><div class="tableWrap"><table class="table"><thead><tr><th>班級</th><th>學號</th><th>單元</th><th>成績</th><th>完成時間</th></tr></thead><tbody>${rows || `<tr><td colspan="5" class="teacher-empty">目前尚無已同步的測驗紀錄。</td></tr>`}</tbody></table></div></section><section class="card teacher-section"><h2>AI 糾錯回報</h2><p>待處理：<b>${reports.filter(x => x.status === "submitted" || x.status === "under_review").length}</b> 件　｜　累積：${reports.length} 件</p></section><div class="note">教師後台不再使用本機示範資料。若統計為 0，表示學生端紀錄尚未透過受保護的後端流程寫入 Supabase。</div>`;
   }
 
-  async function restoreTeacherSession() {
-    if (!client) return injectTeacherEntry();
-    const { data } = await client.auth.getSession();
-    const user = data.session?.user;
-    if (user && await verifyTeacher(user.id)) return renderTeacherDashboard(user);
-    // 學生使用 Supabase 匿名工作階段；不可在教師權限檢查時將其登出。
-    if (user && !user.is_anonymous) await client.auth.signOut();
+  function initializeTeacherEntry() {
+    // 首頁一律保留學生登入流程。即使瀏覽器仍有教師工作階段，
+    // 也只能由教師主動點選「教師專用登入」後進入後台。
     injectTeacherEntry();
   }
 
   addStyles();
   const observer = new MutationObserver(injectTeacherEntry);
   observer.observe(document.getElementById("app"), { childList:true, subtree:true });
-  restoreTeacherSession();
+  initializeTeacherEntry();
 })();
