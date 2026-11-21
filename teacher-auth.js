@@ -159,7 +159,7 @@
       return;
     }
     const rows = entries.map(x => `<tr><td><b>${escapeHtml(x.rank)}</b></td><td>${escapeHtml(x.className)}</td><td>${escapeHtml(x.studentNumber)}</td><td>${escapeHtml(x.nickname)}</td><td><b>${escapeHtml(x.points)}</b></td><td>${x.public ? "公開" : "不公開"}</td></tr>`).join("");
-    table.innerHTML = `<p>${period}｜共 ${escapeHtml(entries.length)} 位有積分學生</p><div class="tableWrap"><table class="table"><thead><tr><th>排名</th><th>班級</th><th>學號</th><th>排行榜名稱</th><th>積分</th><th>學生公開設定</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    table.innerHTML = `<p>${period}｜共 ${escapeHtml(entries.length)} 位有積分學生</p><div class="tableWrap"><table class="table"><thead><tr><th>排名</th><th>班級</th><th>學號</th><th>暱稱／學號</th><th>積分</th><th>學生公開設定</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
   function initializeTeacherEntry() {
