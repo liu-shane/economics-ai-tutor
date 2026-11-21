@@ -31,6 +31,9 @@
       .teacher-section{padding:20px;margin-top:16px}
       .teacher-section h2{margin:0 0 12px}
       .teacher-empty{padding:28px;text-align:center;color:#64748b}
+      .teacher-board-controls{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:12px 0 16px}
+      .teacher-board-controls label{margin:0;min-width:180px}
+      .teacher-board-controls .control{margin-top:5px}
       @media(max-width:820px){.teacher-grid{grid-template-columns:repeat(2,1fr)}}
       @media(max-width:520px){.teacher-grid{grid-template-columns:1fr}.teacher-bar{align-items:flex-start;flex-direction:column}}
     `;
@@ -127,7 +130,36 @@
       const enrollment = enrollmentMap.get(x.enrollment_id) || {};
       return `<tr><td>${escapeHtml(classMap.get(enrollment.class_id) || "—")}</td><td>${escapeHtml(enrollment.student_number || "—")}</td><td>${escapeHtml(x.unit_code)}</td><td><b>${escapeHtml(x.score ?? "—")} 分</b></td><td>${escapeHtml(x.completed_at ? new Date(x.completed_at).toLocaleString("zh-TW") : "—")}</td></tr>`;
     }).join("");
-    host.innerHTML = `<div class="teacher-grid"><div class="stat"><b>${students.size}</b><small>參與學生</small></div><div class="stat"><b>${completed.length}</b><small>完成測驗</small></div><div class="stat"><b>${average}</b><small>平均成績</small></div><div class="stat"><b>${consultations.length}</b><small>AI 諮詢</small></div></div><section class="card teacher-section"><h2>最近測驗紀錄</h2><div class="tableWrap"><table class="table"><thead><tr><th>班級</th><th>學號</th><th>單元</th><th>成績</th><th>完成時間</th></tr></thead><tbody>${rows || `<tr><td colspan="5" class="teacher-empty">目前尚無已同步的測驗紀錄。</td></tr>`}</tbody></table></div></section><section class="card teacher-section"><h2>AI 糾錯回報</h2><p>待處理：<b>${reports.filter(x => x.status === "submitted" || x.status === "under_review").length}</b> 件　｜　累積：${reports.length} 件</p></section><div class="note">教師後台不再使用本機示範資料。若統計為 0，表示學生端紀錄尚未透過受保護的後端流程寫入 Supabase。</div>`;
+    host.innerHTML = `<div class="teacher-grid"><div class="stat"><b>${students.size}</b><small>參與學生</small></div><div class="stat"><b>${completed.length}</b><small>完成測驗</small></div><div class="stat"><b>${average}</b><small>平均成績</small></div><div class="stat"><b>${consultations.length}</b><small>AI 諮詢</small></div></div><section class="card teacher-section"><h2>完整學習排行榜</h2><div class="teacher-board-controls"><label>排行榜類型<select id="teacherBoardType" class="control"><option value="all">全部班級</option><option value="trade_logistics">國貿＋流通</option><option value="fashion">時尚班級</option></select></label><label>積分期間<select id="teacherBoardScope" class="control"><option value="weekly">本週積分</option><option value="semester">學期累積</option></select></label><button id="refreshTeacherBoard" class="btn secondary">更新排行榜</button></div><div id="teacherBoardTable" class="teacher-empty">正在讀取完整排行榜…</div></section><section class="card teacher-section"><h2>最近測驗紀錄</h2><div class="tableWrap"><table class="table"><thead><tr><th>班級</th><th>學號</th><th>單元</th><th>成績</th><th>完成時間</th></tr></thead><tbody>${rows || `<tr><td colspan="5" class="teacher-empty">目前尚無已同步的測驗紀錄。</td></tr>`}</tbody></table></div></section><section class="card teacher-section"><h2>AI 糾錯回報</h2><p>待處理：<b>${reports.filter(x => x.status === "submitted" || x.status === "under_review").length}</b> 件　｜　累積：${reports.length} 件</p></section><div class="note">教師後台排行榜會顯示所有有積分學生，包含選擇不公開者；此完整資料僅限已授權教師查看。</div>`;
+    document.getElementById("refreshTeacherBoard").onclick = loadTeacherLeaderboard;
+    document.getElementById("teacherBoardType").onchange = loadTeacherLeaderboard;
+    document.getElementById("teacherBoardScope").onchange = loadTeacherLeaderboard;
+    await loadTeacherLeaderboard();
+  }
+
+  async function loadTeacherLeaderboard() {
+    const table = document.getElementById("teacherBoardTable");
+    if (!table) return;
+    table.innerHTML = `<div class="teacher-empty">正在讀取完整排行榜…</div>`;
+    const type = document.getElementById("teacherBoardType")?.value || "all";
+    const scope = document.getElementById("teacherBoardScope")?.value || "weekly";
+    const { data, error } = await client.rpc("get_teacher_learning_leaderboard", {
+      requested_type: type,
+      requested_scope: scope,
+      requested_week_start: null
+    });
+    if (error) {
+      table.innerHTML = `<div class="note">排行榜讀取失敗：${escapeHtml(error.message)}</div>`;
+      return;
+    }
+    const entries = data?.entries || [];
+    const period = scope === "weekly" ? `本週（${escapeHtml(data?.weekStart || "—")}起）` : "本學期累積";
+    if (!entries.length) {
+      table.innerHTML = `<p>${period}目前尚無積分紀錄。</p>`;
+      return;
+    }
+    const rows = entries.map(x => `<tr><td><b>${escapeHtml(x.rank)}</b></td><td>${escapeHtml(x.className)}</td><td>${escapeHtml(x.studentNumber)}</td><td>${escapeHtml(x.nickname)}</td><td><b>${escapeHtml(x.points)}</b></td><td>${x.public ? "公開" : "不公開"}</td></tr>`).join("");
+    table.innerHTML = `<p>${period}｜共 ${escapeHtml(entries.length)} 位有積分學生</p><div class="tableWrap"><table class="table"><thead><tr><th>排名</th><th>班級</th><th>學號</th><th>排行榜名稱</th><th>積分</th><th>學生公開設定</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
   function initializeTeacherEntry() {
