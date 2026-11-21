@@ -5,6 +5,8 @@ window.ECON_SUPABASE = Object.freeze({
   publishableKey: "sb_publishable_2x7jEM4iAfij_nmXSOEUdQ_xofVq3AF",
   // Anonymous Sign-Ins、005 SQL 與學生名冊均已完成。
   studentCloudAuthEnabled: true,
+  // 011 SQL 完成後改為 true，學生只需班級＋學號即可登入。
+  passwordlessStudentLoginEnabled: false,
   // 007 題庫與伺服器判分 SQL 已完成。
   cloudLearningSyncEnabled: true,
   // 008 排行榜 SQL 已完成。
